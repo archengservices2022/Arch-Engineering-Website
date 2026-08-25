@@ -1,21 +1,44 @@
 "use client";
 import { useState } from "react";
 
-export default function QuoteForm() {
-  const [sent, setSent] = useState(false);
+type Status = "idle" | "sending" | "success" | "error";
 
-  function submit(event: React.FormEvent<HTMLFormElement>) {
+export default function QuoteForm() {
+  const [status, setStatus] = useState<Status>("idle");
+  const [message, setMessage] = useState("");
+
+  async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const form = new FormData(event.currentTarget);
-    const subject = encodeURIComponent(`Project enquiry: ${form.get("service")}`);
-    const body = encodeURIComponent(
-      `Name: ${form.get("name")}\nEmail: ${form.get("email")}\nPhone: ${form.get("phone")}\nCompany: ${form.get("company")}\nService: ${form.get("service")}\nTimeline: ${form.get("timeline")}\nBudget: ${form.get("budget")}\n\nProject details:\n${form.get("details")}`
-    );
-    setSent(true);
-    window.location.href = `mailto:archengservices2022@gmail.com?subject=${subject}&body=${body}`;
+    const formElement = event.currentTarget;
+    const form = new FormData(formElement);
+    setStatus("sending");
+    setMessage("");
+
+    const payload = Object.fromEntries(form.entries());
+
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      const result = await response.json() as { ok?: boolean; error?: string };
+
+      if (!response.ok || !result.ok) {
+        throw new Error(result.error || "We could not send your enquiry.");
+      }
+
+      formElement.reset();
+      setStatus("success");
+      setMessage("Thank you. Your project enquiry was sent successfully. Arch Engineering will contact you soon.");
+    } catch (error) {
+      setStatus("error");
+      setMessage(error instanceof Error ? error.message : "We could not send your enquiry. Please try again.");
+    }
   }
 
   return <form className="quote-form" onSubmit={submit}>
+    <input className="form-honeypot" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" />
     <div className="form-row">
       <label>Full name *<input name="name" required autoComplete="name" /></label>
       <label>Email *<input name="email" type="email" required autoComplete="email" /></label>
@@ -38,9 +61,11 @@ export default function QuoteForm() {
       <label>Desired timeline<select name="timeline"><option>Flexible</option><option>Within 1 month</option><option>1–3 months</option><option>3+ months</option></select></label>
       <label>Approximate budget<select name="budget"><option>Not decided</option><option>Under $5,000</option><option>$5,000–$15,000</option><option>$15,000+</option></select></label>
     </div>
-    <label>Project details *<textarea name="details" rows={7} required placeholder="Describe the current problem, available files or systems, and the result you need." /></label>
-    <button className="button primary" type="submit">Prepare email enquiry →</button>
-    <small>Your email app will open with the quote details addressed to archengservices2022@gmail.com. Review it, then press Send.</small>
-    {sent && <p className="form-note">Your email application should now be open. If it did not open, email archengservices2022@gmail.com directly.</p>}
+    <label>Project details *<textarea name="details" rows={7} required maxLength={5000} placeholder="Describe the current problem, available files or systems, and the result you need." /></label>
+    <button className="button primary" type="submit" disabled={status === "sending"}>
+      {status === "sending" ? "Sending enquiry…" : "Send quote request →"}
+    </button>
+    <small>Your enquiry is submitted securely and a notification is sent directly to Arch Engineering.</small>
+    {message && <p className={status === "success" ? "form-note form-success" : "form-note form-error"} role="status">{message}</p>}
   </form>;
 }
