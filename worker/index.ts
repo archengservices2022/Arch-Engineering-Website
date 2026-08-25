@@ -45,7 +45,7 @@ async function handleContact(request: Request, env: Env): Promise<Response> {
 
   let payload: ContactPayload;
   try {
-    payload = await request.json<ContactPayload>();
+    payload = (await request.json()) as ContactPayload;
   } catch {
     return new Response(JSON.stringify({ ok: false, error: "Invalid request." }), { status: 400, headers: jsonHeaders });
   }
