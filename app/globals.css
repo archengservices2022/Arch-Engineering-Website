@@ -45,3 +45,40 @@ footer .wordmark strong{color:var(--ink)}
 
 /* Premium typography and complete brand mark */
 button,input,select,textarea{font:inherit}body{font-feature-settings:"kern" 1,"liga" 1;text-rendering:optimizeLegibility}.wordmark>img{width:50px;height:44px;object-fit:contain;object-position:center;flex:0 0 50px;filter:drop-shadow(0 8px 15px rgba(12,95,205,.16))}.wordmark b,.wordmark strong,nav,.header-cta{font-family:"Manrope","Segoe UI",Arial,sans-serif}
+
+/* Readability improvements for quote forms and service detail tags */
+.quote-form label{
+  gap:10px;
+  font-size:13px;
+  line-height:1.35;
+  font-weight:700;
+  color:#173b5d;
+  letter-spacing:.015em;
+}
+.quote-form input,
+.quote-form select,
+.quote-form textarea{
+  min-height:50px;
+  padding:15px 16px;
+  font-size:14px;
+  line-height:1.5;
+  font-weight:500;
+  color:#10243a;
+}
+.quote-form textarea{min-height:150px}
+.quote-form input::placeholder,
+.quote-form textarea::placeholder{
+  color:#6b7e91;
+  opacity:1;
+  font-size:13px;
+}
+.tags,.tech{gap:8px}
+.tags span,.tech span{
+  padding:8px 12px;
+  font-size:11px;
+  line-height:1.2;
+  letter-spacing:.02em;
+  font-weight:700;
+  color:#274b69;
+  background:#eaf2f8;
+}
