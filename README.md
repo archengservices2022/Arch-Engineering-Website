@@ -6,7 +6,7 @@ Vinext, Vite, and Cloudflare Workers.
 ## Local development
 
 ```bash
-npm ci
+npm install
 npm run dev
 ```
 
@@ -22,6 +22,7 @@ npm run build
 The repository is ready for Cloudflare Workers Builds.
 
 - Production branch: `main`
+- Install command: `npm install`
 - Build command: `npm run build`
 - Deploy command: `npx wrangler deploy`
 
