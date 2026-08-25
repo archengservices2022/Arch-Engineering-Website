@@ -131,9 +131,31 @@ function serviceAnswer(service: Service, question: string) {
   return { text: `${service.title}\n\n${service.summary}\n\nOutcome: ${service.outcome}`, actions: serviceActions(service) };
 }
 
-function answer(question: string): { text: string; actions?: Action[] } {
+function answer(question: string, recentBotText = ""): { text: string; actions?: Action[] } {
   const q = normalize(question);
   if (!q) return { text: "Please type a question about Arch Engineering Services." };
+
+  // Let visitors choose a service by entering the number shown in the latest category list.
+  const numberMatch = q.match(/^(?:number\s*)?(\d{1,2})$/);
+  if (numberMatch) {
+    const selectedNumber = Number(numberMatch[1]);
+    const recent = normalize(recentBotText);
+    const category = recent.includes("software development services")
+      ? softwareServices
+      : recent.includes("mechanical engineering services")
+        ? mechanicalServices
+        : null;
+    if (category && selectedNumber >= 1 && selectedNumber <= category.length) {
+      return serviceAnswer(category[selectedNumber - 1], question);
+    }
+    return {
+      text: "Please first choose Mechanical services or Software services, then enter the service number.",
+      actions: [
+        { label: "Mechanical services", query: "Mechanical services" },
+        { label: "Software services", query: "Software services" }
+      ]
+    };
+  }
   if (includesAny(q, ["thank you", "thanks", "thankyou", "appreciate"])) return { text: "You’re welcome! I’m happy to help. Ask me another question anytime." };
   if (includesAny(q, ["bye", "goodbye", "see you", "talk to you later"])) return { text: "Goodbye! Thank you for visiting Arch Engineering Services." };
   if (includesAny(q, ["how are you", "how r u", "how is it going"])) return { text: "I’m doing well, thank you! I’m ready to help with engineering, CAD automation, or software questions." };
@@ -214,8 +236,9 @@ export default function Chatbot() {
     setMessages(current => [...current, { from: "user", text: clean, time: now() }]);
     setText("");
     setTyping(true);
+    const recentBotText = [...messages].reverse().find(message => message.from === "bot")?.text || "";
     window.setTimeout(() => {
-      const response = answer(clean);
+      const response = answer(clean, recentBotText);
       setMessages(current => [...current, { from: "bot", ...response, time: now() }]);
       setTyping(false);
     }, 450);
