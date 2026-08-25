@@ -82,3 +82,14 @@ button,input,select,textarea{font:inherit}body{font-feature-settings:"kern" 1,"l
   color:#274b69;
   background:#eaf2f8;
 }
+
+/* Improve hero experience-stat label readability */
+.reference-stats span{
+  display:block;
+  margin-top:7px;
+  font-size:12px;
+  line-height:1.4;
+  letter-spacing:.025em;
+  font-weight:600;
+  color:#d9e7f1;
+}
