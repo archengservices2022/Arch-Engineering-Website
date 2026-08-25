@@ -104,7 +104,7 @@ function findService(question: string) {
 }
 function categoryAnswer(items: Service[], label: string) {
   return {
-    text: `Arch Engineering Services provides these ${label} services:\n\n${numbered(items.map(service => service.title))}\n\nChoose a service below to learn more.`,
+    text: `Arch Engineering Services provides these ${label} services:\n\n${numbered(items.map(service => service.title))}\n\nSelect a button below or enter a service number (1–${items.length}) to learn more.`,
     actions: items.slice(0, 8).map(service => ({ label: service.title, query: `Tell me about ${service.title}` }))
   };
 }
